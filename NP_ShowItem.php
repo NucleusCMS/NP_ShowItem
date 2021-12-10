@@ -9,9 +9,7 @@ class NP_ShowItem extends NucleusPlugin {
 	function doSkinVar ($skinType, $template  = '', $itemid  = '')
 	{
 		global $blog, $manager;
-		$itemid = intval($itemid);
-		if (!isset($blog)) $blog = & $manager->getBlog(getBlogIDFromItemID($itemid));
-		
+
 		$query  = sprintf(
 			"SELECT
 				i.inumber   AS itemid,
@@ -32,15 +30,19 @@ class NP_ShowItem extends NucleusPlugin {
 				%s AS c,
 				%s AS m
 			WHERE 
-				    i.inumber=%u
+				i.inumber=%u
 				AND c.catid=i.icat
-			limit 1"
-			, mysql_real_escape_string(sql_table('item'))
-			, mysql_real_escape_string(sql_table('category'))
-			, mysql_real_escape_string(sql_table('member'))
-			, intval($itemid) //ultrarich
+			limit 1",
+			sql_real_escape_string(sql_table('item')),
+			sql_real_escape_string(sql_table('category')),
+			sql_real_escape_string(sql_table('member')),
+			(int) $itemid //ultrarich
 		);
+
+		if (!isset($blog)) {
+			$blog = & $manager->getBlog(getBlogIDFromItemID((int) $itemid));
+		}
+
 		$blog->showUsingQuery($template, $query, '', 1, 1);
 	}
 }
-?>
